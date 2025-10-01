@@ -19,15 +19,15 @@ export class ExercisesService {
   ];
 
   create(createExerciseDto: CreateExerciseDto) {
-    const exercisesByHighestId = [...this.exercises].sort(
-      (a, b) => b.id - a.id,
-    );
-    const newExercise = {
-      id: exercisesByHighestId[0].id + 1,
-      ...createExerciseDto,
-    };
-    this.exercises.push(newExercise);
-    return newExercise;
+    // const exercisesByHighestId = [...this.exercises].sort(
+    //   (a, b) => b.id - a.id,
+    // );
+    // const newExercise = {
+    //   id: exercisesByHighestId[0].id + 1,
+    //   ...createExerciseDto,
+    // };
+    // this.exercises.push(newExercise);
+    // return newExercise;
   }
 
   findAll() {

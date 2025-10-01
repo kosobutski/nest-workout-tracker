@@ -1,4 +1,4 @@
-import { IsArray, IsEnum, IsNumber, IsString } from 'class-validator';
+import { IsArray, IsEnum, IsString } from 'class-validator';
 import { MuscleGroup } from '../../common/utils';
 
 export class CreateExerciseDto {
@@ -18,10 +18,4 @@ export class CreateExerciseDto {
 
   @IsString()
   equipment: string;
-
-  @IsNumber()
-  sets: number;
-
-  @IsNumber()
-  repeats: number;
 }

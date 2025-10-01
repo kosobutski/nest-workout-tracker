@@ -1,8 +1,12 @@
-import { IsBoolean, IsNumber, IsString } from 'class-validator';
+import { IsBoolean, IsEmail, IsNumber, IsString } from 'class-validator';
 
 export class CreateUserDto {
   @IsString()
   name: string;
+
+  @IsString()
+  @IsEmail()
+  email: string;
 
   @IsNumber()
   age: number;

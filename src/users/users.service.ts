@@ -1,9 +1,15 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { PrismaService } from '../prisma.service';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
+  constructor(private prisma: PrismaService) {}
+
   private users = [
     {
       id: 1,
@@ -14,14 +20,10 @@ export class UsersService {
     },
   ];
 
-  create(createUserDto: CreateUserDto) {
-    const usersByHighestId = [...this.users].sort((a, b) => b.id - a.id);
-    const newUser = {
-      id: usersByHighestId[0].id + 1,
-      ...createUserDto,
-    };
-    this.users.push(newUser);
-    return newUser;
+  create(data: Prisma.UserCreateInput) {
+    return this.prisma.user.create({
+      data,
+    });
   }
 
   findAll() {
