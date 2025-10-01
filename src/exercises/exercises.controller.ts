@@ -18,30 +18,30 @@ export class ExercisesController {
   constructor(private readonly exercisesService: ExercisesService) {}
 
   @Post()
-  create(@Body(ValidationPipe) createExerciseDto: CreateExerciseDto) {
-    return this.exercisesService.create(createExerciseDto);
+  async create(@Body(ValidationPipe) createExerciseDto: CreateExerciseDto) {
+    return await this.exercisesService.create(createExerciseDto);
   }
 
   @Get()
-  findAll() {
-    return this.exercisesService.findAll();
+  async findAll() {
+    return await this.exercisesService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.exercisesService.findOne({ id });
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    return await this.exercisesService.findOne({ id });
   }
 
   @Patch(':id')
-  update(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body(ValidationPipe) updateExerciseDto: UpdateExerciseDto,
   ) {
-    return this.exercisesService.update({ id }, updateExerciseDto);
+    return await this.exercisesService.update({ id }, updateExerciseDto);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.exercisesService.remove({ id });
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    return await this.exercisesService.remove({ id });
   }
 }

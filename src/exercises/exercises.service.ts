@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { Exercise, Prisma } from '@prisma/client';
 
@@ -6,35 +6,57 @@ import { Exercise, Prisma } from '@prisma/client';
 export class ExercisesService {
   constructor(private prisma: PrismaService) {}
 
-  create(data: Prisma.ExerciseCreateInput): Promise<Exercise> {
-    return this.prisma.exercise.create({
+  async create(data: Prisma.ExerciseCreateInput): Promise<Exercise> {
+    return await this.prisma.exercise.create({
       data,
     });
   }
 
-  findAll() {
-    return this.prisma.exercise.findMany();
+  async findAll() {
+    return await this.prisma.exercise.findMany();
   }
 
-  findOne(where: Prisma.ExerciseWhereUniqueInput): Promise<Exercise | null> {
-    return this.prisma.exercise.findUnique({
+  async findOne(where: Prisma.ExerciseWhereUniqueInput): Promise<Exercise> {
+    const exercise = await this.prisma.exercise.findUnique({
       where,
     });
+    if (!exercise) {
+      throw new NotFoundException(`Exercise with id ${where.id} not found`);
+    }
+    return exercise;
   }
 
-  update(
+  async update(
     where: Prisma.ExerciseWhereUniqueInput,
     data: Prisma.ExerciseUpdateInput,
   ): Promise<Exercise> {
-    return this.prisma.exercise.update({
-      data,
-      where,
-    });
+    try {
+      return await this.prisma.exercise.update({
+        data,
+        where,
+      });
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw new NotFoundException(`Exercise with id ${where.id} not found`);
+        }
+      }
+      throw error;
+    }
   }
 
-  remove(where: Prisma.ExerciseWhereUniqueInput): Promise<Exercise> {
-    return this.prisma.exercise.delete({
-      where,
-    });
+  async remove(where: Prisma.ExerciseWhereUniqueInput): Promise<Exercise> {
+    try {
+      return await this.prisma.exercise.delete({
+        where,
+      });
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw new NotFoundException(`Exercise with id ${where.id} not found`);
+        }
+      }
+      throw error;
+    }
   }
 }
