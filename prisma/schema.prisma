@@ -22,6 +22,8 @@ model User {
   height      Int
   weight      Int
   createdAt   DateTime    @default(now())
+
+  WorkoutLog WorkoutLog[]
 }
 
 model Exercise {
@@ -31,6 +33,21 @@ model Exercise {
   primary_muscle_group      MuscleGroup
   secondary_muscle_groups   MuscleGroup[]
   equipment                 String?
+
+  WorkoutLog WorkoutLog[]
+}
+
+model WorkoutLog {
+  id            Int           @default(autoincrement()) @id
+  userId        Int
+  exerciseId    Int
+  sets          Int
+  repeats       Int
+  weight        Float?
+  date          DateTime      @default(now())
+
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exercise      Exercise      @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
 }
 
 enum MuscleGroup {
