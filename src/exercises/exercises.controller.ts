@@ -29,7 +29,7 @@ export class ExercisesController {
 
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.exercisesService.findOne(id);
+    return this.exercisesService.findOne({ id });
   }
 
   @Patch(':id')
@@ -37,11 +37,11 @@ export class ExercisesController {
     @Param('id', ParseIntPipe) id: number,
     @Body(ValidationPipe) updateExerciseDto: UpdateExerciseDto,
   ) {
-    return this.exercisesService.update(id, updateExerciseDto);
+    return this.exercisesService.update({ id }, updateExerciseDto);
   }
 
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number) {
-    return this.exercisesService.remove(id);
+    return this.exercisesService.remove({ id });
   }
 }
