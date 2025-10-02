@@ -8,6 +8,7 @@ import {
   Delete,
   ValidationPipe,
   ParseIntPipe,
+  Query,
 } from '@nestjs/common';
 import { WorkoutLogService } from './workout-log.service';
 import { CreateWorkoutLogDto } from './dto/create-workout-log.dto';
@@ -23,8 +24,10 @@ export class WorkoutLogController {
   }
 
   @Get()
-  async findAll() {
-    return await this.workoutLogService.findAll();
+  async findAll(
+    @Query('user_id', new ParseIntPipe({ optional: true })) userId?: number,
+  ) {
+    return this.workoutLogService.findAll(userId ? { userId } : undefined);
   }
 
   @Get(':id')

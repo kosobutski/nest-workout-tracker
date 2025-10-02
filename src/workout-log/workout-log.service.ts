@@ -13,8 +13,10 @@ export class WorkoutLogService {
     });
   }
 
-  async findAll(): Promise<WorkoutLog[]> {
-    return await this.prisma.workoutLog.findMany();
+  async findAll(where?: Prisma.WorkoutLogWhereInput): Promise<WorkoutLog[]> {
+    return await this.prisma.workoutLog.findMany({
+      where,
+    });
   }
 
   async findOne(where: Prisma.WorkoutLogWhereUniqueInput): Promise<WorkoutLog> {
