@@ -1,98 +1,65 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Backend-система для трекера силовых спортивных тренировок на NestJS 
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## Описание
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+Backend-приложение, позволяющее пользователям записывать в базу данных информацию о том, какие физические упражнения (из заранее созданного в БД списка) они выполняли.
 
-## Description
+## Кратко о структуре БД
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Полная структура моделей баз данных приведена в файле src/prisma/schema.prisma.\
+Кратко: существуют модели User (пользователь, имеет имя, email, пол и т. д.) и Exercise (упражнение, имеет название, описание, перечисление задействованных в упражнении мышц и т. д.).
+Обе эти модели имеют автоинкрементное поле id, предназначенное для связки пользователя с выполненным упражнением в модели WorkoutLog - эта модель также содержит поля количества подходов, повторений за 1 подход
+и вес (опционально). Таким образом, база данных приведена в 3НФ и транзитивные зависимости отсутствуют.
 
-## Project setup
+## Эндпоинты
+
+### /users
+```GET /users``` - получить массив всех пользователей\
+```GET /users/:id``` - получить конкретного пользователя по id\
+```POST /users``` - создать нового пользователя\
+```PATCH /users/:id``` - обновить информацию о пользователе\
+```DELETE /users/:id``` - удалить пользователя по id
+
+### /exercises
+```GET /exercises``` - получить массив всех упражнений\
+```GET /exercises/:id``` - получить информацию о конкретном упражнении по id\
+```POST /exercises``` - создать новое упражнениея\
+```PATCH /exercises/:id``` - обновить информацию об упражнении\
+```DELETE /exercises/:id``` - удалить упражнение по id
+
+### /workout-log
+```GET /workout-log``` - получить массив всех записей о выполненных упражнениях (для авторизованного пользователя)\
+```GET /workout-log/:id``` - получить конкретную запись по id\
+```POST /workout-log``` - создать новоую запись\
+```PATCH /workout-log/:id``` - обновить запись\
+```DELETE /workout-log/:id``` - удалить запись по id
+
+### /auth
+```POST /auth/login``` - авторизация
+
+Для взаимодействия с эндпоинтом /workout-log пользователь должен быть авторизован. С использованием Bearer-токена он сможет взаимодействовать только с записями, связанными с его аккаунтом
+(то есть только с теми записями WorkoutLog, где в поле userId указан его id). В противном случае пользователь получит ошибку ```401 Unauthorized```.
+
+## Авторизация
+Авторизация сделана на основе стандарта JWT. Для входа в систему и получения возможности полноценного пользования приложением, пользователь должен иметь запись о себе в таблице User (а следовательно - иметь зарегистрированный email и пароль). Если такая запись есть, то пользователю следует отправить POST-запрос на эндпоинт /auth/login, где в body запроса указать свои значения email и password. При успешной авторизации пользователю будет выдан access token (действителен в течение 30 дней), который при последующих запросах на /workout-log нужно передавать в заголовке Authorization по шаблону ```Bearer ${access_token}```.
+
+## Настройка
 
 ```bash
 $ yarn install
+$ npx prisma migrate
 ```
+Перед запуском нужно создать файл ```.env``` и указать в нем свои значения переменных окружения. Нужные названия переменных представлены в файле ```.env.example```.
 
-## Compile and run the project
+## Запуск
 
 ```bash
 # development
-$ yarn run start
+$ yarn start
 
 # watch mode
-$ yarn run start:dev
+$ yarn start:dev
 
 # production mode
-$ yarn run start:prod
+$ yarn start:prod
 ```
-
-## Run tests
-
-```bash
-# unit tests
-$ yarn run test
-
-# e2e tests
-$ yarn run test:e2e
-
-# test coverage
-$ yarn run test:cov
-```
-
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ yarn install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
