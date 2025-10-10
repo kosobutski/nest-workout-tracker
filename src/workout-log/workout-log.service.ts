@@ -7,7 +7,9 @@ import { CreateWorkoutLogDto } from './dto/create-workout-log.dto';
 export class WorkoutLogService {
   constructor(private prisma: PrismaService) {}
 
-  async create(data: CreateWorkoutLogDto): Promise<WorkoutLog> {
+  async create(
+    data: CreateWorkoutLogDto & { userId: number },
+  ): Promise<WorkoutLog> {
     return await this.prisma.workoutLog.create({
       data,
     });
@@ -16,12 +18,21 @@ export class WorkoutLogService {
   async findAll(where?: Prisma.WorkoutLogWhereInput): Promise<WorkoutLog[]> {
     return await this.prisma.workoutLog.findMany({
       where,
+      include: {
+        exercise: true,
+      },
+      orderBy: {
+        date: 'desc',
+      },
     });
   }
 
   async findOne(where: Prisma.WorkoutLogWhereUniqueInput): Promise<WorkoutLog> {
     const log = await this.prisma.workoutLog.findUnique({
       where,
+      include: {
+        exercise: true,
+      },
     });
     if (!log) {
       throw new NotFoundException(`Workout log with id ${where.id} not found`);
